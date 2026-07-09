@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>iPad 庫存清點｜位置集中版 v1</title>
+  <title>iPad 庫存清點｜位置集中收折數字鍵版 v3</title>
   <style>
     :root{
       --bg:#f5f5f4; --panel:#ffffff; --text:#1c1917; --muted:#78716c; --line:#d6d3d1;
@@ -24,7 +24,7 @@
     .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.stat{background:#fafaf9;border:1px solid var(--line);border-radius:14px;padding:10px}.stat b{display:block;font-size:20px}.stat span{font-size:12px;color:var(--muted)}
     .posList{display:flex;flex-direction:column;gap:8px;margin-top:12px}.posBtn{width:100%;text-align:left;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}.posBtn.active{border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}.posName{font-weight:800}.posMeta{font-size:12px;color:var(--muted);margin-top:3px}.bar{height:8px;background:#e7e5e4;border-radius:999px;overflow:hidden;margin-top:8px}.bar>i{display:block;height:100%;background:var(--accent);width:0%}
     .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.search{flex:1;min-width:220px}
-    .item{border:1px solid var(--line);border-radius:18px;background:#fff;margin:10px 0;padding:14px}.item.done{background:var(--good);border-color:#86efac}.item.issue{background:var(--warn);border-color:#facc15}.item.missing{background:var(--bad);border-color:#fca5a5}.id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#f5f5f4;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-weight:800}.name{font-size:18px;font-weight:800;margin:8px 0 2px}.spec{color:var(--muted);font-size:14px;line-height:1.45}.grid{display:grid;grid-template-columns:120px 1fr 135px 1fr;gap:8px 10px;align-items:center;margin-top:12px}.label{font-size:12px;color:var(--muted);font-weight:700}.qty{width:100%}.status{width:100%}.note{grid-column:2 / -1}.empty{padding:40px 12px;text-align:center;color:var(--muted)}
+    .item{border:1px solid var(--line);border-radius:18px;background:#fff;margin:10px 0;overflow:hidden}.item.done{background:var(--good);border-color:#86efac}.item.issue{background:var(--warn);border-color:#facc15}.item.missing{background:var(--bad);border-color:#fca5a5}.item summary{list-style:none;cursor:pointer;padding:14px}.item summary::-webkit-details-marker{display:none}.summaryLine{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}.summaryMain{min-width:0}.summaryName{font-size:17px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.summarySpec{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.summaryRight{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.chev{font-weight:900;color:var(--muted);transition:transform .15s ease}.item[open] .chev{transform:rotate(90deg)}.itemBody{padding:0 14px 14px;border-top:1px solid rgba(214,211,209,.7)}.id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#f5f5f4;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-weight:800}.name{font-size:18px;font-weight:800;margin:8px 0 2px}.spec{color:var(--muted);font-size:14px;line-height:1.45}.grid{display:grid;grid-template-columns:120px 1fr 135px 1fr;gap:8px 10px;align-items:center;margin-top:12px}.label{font-size:12px;color:var(--muted);font-weight:700}.qty{width:100%}.status{width:100%}.note{grid-column:2 / -1}.empty{padding:40px 12px;text-align:center;color:var(--muted)}
     .sectionTitle{font-size:18px;font-weight:900;margin:0}.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fafaf9;border-radius:999px;padding:6px 10px;font-size:13px;color:var(--muted)}
     dialog{border:0;border-radius:20px;box-shadow:0 20px 80px rgba(0,0,0,.25);max-width:720px;width:calc(100% - 28px);padding:0}dialog::backdrop{background:rgba(0,0,0,.35)}.modal{padding:18px}.modal h2{margin:0 0 10px}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;background:#f5f5f4;border-radius:12px;padding:10px;overflow:auto;max-height:180px}
     @media (max-width: 820px){main{grid-template-columns:1fr;padding:10px}.side{position:relative;top:auto;max-height:none}.grid{grid-template-columns:1fr}.note{grid-column:1}.work{padding:12px}.toolbar{position:sticky;top:79px;background:rgba(255,255,255,.94);z-index:10;padding:8px;border-radius:16px;border:1px solid var(--line)}}
@@ -33,7 +33,7 @@
 </head>
 <body>
 <header>
-  <h1>iPad 庫存清點｜位置集中版 v1</h1>
+  <h1>iPad 庫存清點｜位置集中收折數字鍵版 v3</h1>
   <div class="sub">先集中同一存放位置的物品，再一起整理、清點、歸位。全程離線，不會直接改你的主表。</div>
 </header>
 <main>
@@ -70,6 +70,8 @@
       <button class="small" id="markAllNormal">本位置全部正常</button>
       <button class="small" id="showUndone">只看未完成</button>
       <button class="small" id="showAll">顯示全部</button>
+      <button class="small" id="collapseAll">全部收合</button>
+      <button class="small" id="expandAll">全部展開</button>
     </div>
     <div id="items"></div>
   </section>
@@ -135,7 +137,8 @@ function renderItems(){
 }
 function itemHTML(r){
   const cls = r.checkStatus==='正常'?'done':(r.checkStatus==='找不到'?'missing':(r.checkStatus?'issue':''));
-  return `<article class="item ${cls}" data-id="${esc(r.id)}"><div class="between"><span class="id">${esc(r.id||'無ID')}</span><span class="pill">原列號 ${r._idx}</span></div><div class="name">${esc(r.name||'未命名')}</div><div class="spec">${esc(r.spec||'無規格')}</div><div class="grid"><div class="label">原數量</div><div>${esc(r.qty)} ${esc(r.unit)}</div><div class="label">實際數量</div><input class="qty" value="${esc(r.actualQty)}" onchange="updateField('${escAttr(r.id)}','actualQty',this.value)"><div class="label">新位置</div><input value="${esc(r.newLoc)}" onchange="updateField('${escAttr(r.id)}','newLoc',this.value)"><div class="label">清點狀態</div><select class="status" onchange="updateField('${escAttr(r.id)}','checkStatus',this.value)"><option value="">未清點</option>${['正常','數量不符','位置不符','找不到','待確認'].map(s=>`<option ${r.checkStatus===s?'selected':''}>${s}</option>`).join('')}</select><div class="label">備註</div><textarea class="note" onchange="updateField('${escAttr(r.id)}','note',this.value)" placeholder="例如：外袋破損、數量待複查、已改放新盒">${esc(r.note)}</textarea></div><div class="toolbar noPrint"><button class="small primary" onclick="quickNormal('${escAttr(r.id)}')">正常，位置不變</button><button class="small" onclick="quickStatus('${escAttr(r.id)}','數量不符')">數量不符</button><button class="small" onclick="quickStatus('${escAttr(r.id)}','找不到')">找不到</button><button class="small" onclick="quickStatus('${escAttr(r.id)}','待確認')">待確認</button></div></article>`;
+  const statusText = r.checkStatus || '未清點';
+  return `<details class="item ${cls}" data-id="${esc(r.id)}"><summary><div class="summaryLine"><span class="chev">›</span><div class="summaryMain"><div class="summaryName">${esc(r.name||'未命名')}</div><div class="summarySpec">${esc(r.spec||'無規格')}｜原數量 ${esc(r.qty)} ${esc(r.unit)}</div></div><div class="summaryRight"><span class="id">${esc(r.id||'無ID')}</span><span class="pill">${esc(statusText)}</span></div></div></summary><div class="itemBody"><div class="between" style="margin-top:12px"><span class="id">${esc(r.id||'無ID')}</span><span class="pill">原列號 ${r._idx}</span></div><div class="name">${esc(r.name||'未命名')}</div><div class="spec">${esc(r.spec||'無規格')}</div><div class="grid"><div class="label">原數量</div><div>${esc(r.qty)} ${esc(r.unit)}</div><div class="label">實際數量</div><input class="qty" type="number" inputmode="decimal" min="0" step="any" value="${esc(r.actualQty)}" onchange="updateField('${escAttr(r.id)}','actualQty',this.value)" placeholder="輸入數量"><div class="label">新位置</div><input value="${esc(r.newLoc)}" onchange="updateField('${escAttr(r.id)}','newLoc',this.value)"><div class="label">清點狀態</div><select class="status" onchange="updateField('${escAttr(r.id)}','checkStatus',this.value)"><option value="">未清點</option>${['正常','數量不符','位置不符','找不到','待確認'].map(s=>`<option ${r.checkStatus===s?'selected':''}>${s}</option>`).join('')}</select><div class="label">備註</div><textarea class="note" onchange="updateField('${escAttr(r.id)}','note',this.value)" placeholder="例如：外袋破損、數量待複查、已改放新盒">${esc(r.note)}</textarea></div><div class="toolbar noPrint"><button class="small primary" onclick="quickNormal('${escAttr(r.id)}')">正常，位置不變</button><button class="small" onclick="quickStatus('${escAttr(r.id)}','數量不符')">數量不符</button><button class="small" onclick="quickStatus('${escAttr(r.id)}','找不到')">找不到</button><button class="small" onclick="quickStatus('${escAttr(r.id)}','待確認')">待確認</button></div></div></details>`;
 }
 function updateField(id,field,value){const r=state.rows.find(x=>x.id===id); if(!r)return; r[field]=value; saveRow(r); render();}
 function quickNormal(id){const r=state.rows.find(x=>x.id===id); if(!r)return; r.checkStatus='正常'; r.actualQty=r.actualQty||r.qty; r.newLoc=r.loc||r.newLoc; saveRow(r); render();}
@@ -151,7 +154,7 @@ function exportCSV(){
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function escAttr(s){return esc(s).replace(/`/g,'&#96;');}
 $('csvFile').addEventListener('change',e=>{const f=e.target.files[0]; if(!f)return; const reader=new FileReader(); reader.onload=()=>loadRows(parseCSV(reader.result)); reader.readAsText(f,'utf-8');});
-$('searchBox').addEventListener('input',renderItems); $('exportBtn').onclick=exportCSV; $('markAllNormal').onclick=markAllNormal; $('showUndone').onclick=()=>{state.filterUndone=true;renderItems();}; $('showAll').onclick=()=>{state.filterUndone=false;renderItems();};
+$('searchBox').addEventListener('input',renderItems); $('exportBtn').onclick=exportCSV; $('markAllNormal').onclick=markAllNormal; $('showUndone').onclick=()=>{state.filterUndone=true;renderItems();}; $('showAll').onclick=()=>{state.filterUndone=false;renderItems();}; $('collapseAll').onclick=()=>document.querySelectorAll('#items details').forEach(d=>d.open=false); $('expandAll').onclick=()=>document.querySelectorAll('#items details').forEach(d=>d.open=true);
 $('clearBtn').onclick=()=>{if(confirm('確定清空本工具的暫存清點紀錄？不會影響你的 Google Sheets。')){Object.keys(localStorage).filter(k=>k.startsWith('inv_')).forEach(k=>localStorage.removeItem(k)); state.rows=[];state.selected=null;render();}};
 $('sampleBtn').onclick=()=>loadRows(parseCSV('物品ID,分類碼,名稱,規格,數量,單位,存放位置,狀態,備註\nMOD-0001,MOD,蜂鳴器模組,5V 主動式,5,個,模組、接頭、端子,,\nCON-0001,CON,重定保險開關,5A,2,個,模組、接頭、端子,,\nRES-0001,RES,金屬膜電阻,1K 1/4W,20,個,電阻、電容、LED,,\nHDW-0001,HDW,M3 尼龍柱,10mm,12,個,螺絲、螺帽、隔離柱、墊片,,\n'));
 render();

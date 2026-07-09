@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>iPad 庫存清點｜位置集中版 v1</title>
+  <style>
+    :root{
+      --bg:#f5f5f4; --panel:#ffffff; --text:#1c1917; --muted:#78716c; --line:#d6d3d1;
+      --accent:#0f766e; --accent2:#134e4a; --good:#dcfce7; --warn:#fef3c7; --bad:#fee2e2;
+      --shadow:0 8px 24px rgba(28,25,23,.08); --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",Arial,sans-serif;background:var(--bg);color:var(--text);}
+    header{position:sticky;top:0;z-index:20;background:rgba(245,245,244,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 18px calc(12px + env(safe-area-inset-top));}
+    h1{font-size:22px;margin:0 0 6px;font-weight:800;letter-spacing:.02em}.sub{font-size:13px;color:var(--muted)}
+    main{display:grid;grid-template-columns:320px 1fr;gap:16px;padding:16px;max-width:1280px;margin:0 auto 80px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .side{padding:14px;align-self:start;position:sticky;top:86px;max-height:calc(100vh - 110px);overflow:auto}
+    .work{padding:16px;min-height:70vh}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.between{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    button,.btn,input,select,textarea{font:inherit;border-radius:14px;border:1px solid var(--line);background:#fff;color:var(--text)}
+    button,.btn{padding:10px 14px;font-weight:700;cursor:pointer}.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.danger{background:#991b1b;color:#fff;border-color:#991b1b}.ghost{background:#fafaf9}.small{font-size:13px;padding:7px 10px;border-radius:12px}
+    input,select,textarea{padding:10px 12px;min-height:42px}textarea{width:100%;min-height:62px;resize:vertical}.file{width:100%;margin:10px 0 12px}.hint{font-size:13px;line-height:1.55;color:var(--muted)}
+    .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.stat{background:#fafaf9;border:1px solid var(--line);border-radius:14px;padding:10px}.stat b{display:block;font-size:20px}.stat span{font-size:12px;color:var(--muted)}
+    .posList{display:flex;flex-direction:column;gap:8px;margin-top:12px}.posBtn{width:100%;text-align:left;padding:12px;background:#fff;border:1px solid var(--line);border-radius:14px}.posBtn.active{border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}.posName{font-weight:800}.posMeta{font-size:12px;color:var(--muted);margin-top:3px}.bar{height:8px;background:#e7e5e4;border-radius:999px;overflow:hidden;margin-top:8px}.bar>i{display:block;height:100%;background:var(--accent);width:0%}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.search{flex:1;min-width:220px}
+    .item{border:1px solid var(--line);border-radius:18px;background:#fff;margin:10px 0;padding:14px}.item.done{background:var(--good);border-color:#86efac}.item.issue{background:var(--warn);border-color:#facc15}.item.missing{background:var(--bad);border-color:#fca5a5}.id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#f5f5f4;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-weight:800}.name{font-size:18px;font-weight:800;margin:8px 0 2px}.spec{color:var(--muted);font-size:14px;line-height:1.45}.grid{display:grid;grid-template-columns:120px 1fr 135px 1fr;gap:8px 10px;align-items:center;margin-top:12px}.label{font-size:12px;color:var(--muted);font-weight:700}.qty{width:100%}.status{width:100%}.note{grid-column:2 / -1}.empty{padding:40px 12px;text-align:center;color:var(--muted)}
+    .sectionTitle{font-size:18px;font-weight:900;margin:0}.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fafaf9;border-radius:999px;padding:6px 10px;font-size:13px;color:var(--muted)}
+    dialog{border:0;border-radius:20px;box-shadow:0 20px 80px rgba(0,0,0,.25);max-width:720px;width:calc(100% - 28px);padding:0}dialog::backdrop{background:rgba(0,0,0,.35)}.modal{padding:18px}.modal h2{margin:0 0 10px}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;background:#f5f5f4;border-radius:12px;padding:10px;overflow:auto;max-height:180px}
+    @media (max-width: 820px){main{grid-template-columns:1fr;padding:10px}.side{position:relative;top:auto;max-height:none}.grid{grid-template-columns:1fr}.note{grid-column:1}.work{padding:12px}.toolbar{position:sticky;top:79px;background:rgba(255,255,255,.94);z-index:10;padding:8px;border-radius:16px;border:1px solid var(--line)}}
+    @media print{header,.side,.toolbar,.noPrint{display:none!important}main{display:block}.card{box-shadow:none}.item{break-inside:avoid}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>iPad 庫存清點｜位置集中版 v1</h1>
+  <div class="sub">先集中同一存放位置的物品，再一起整理、清點、歸位。全程離線，不會直接改你的主表。</div>
+</header>
+<main>
+  <aside class="card side">
+    <div class="hint"><b>使用流程</b><br>1. 從 Google Sheets 下載 `01_物品主表` CSV。<br>2. 在這裡載入 CSV。<br>3. 點左側存放位置，一區一區清點。<br>4. 匯出結果，再導入 `09_清點暫存表`。</div>
+    <input id="csvFile" class="file" type="file" accept=".csv,text/csv" />
+    <div class="row">
+      <button class="primary" id="exportBtn">匯出清點結果 CSV</button>
+      <button class="ghost" id="sampleBtn">載入範例</button>
+      <button class="danger" id="clearBtn">清空</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="totalCount">0</b><span>總物品</span></div>
+      <div class="stat"><b id="doneCount">0</b><span>已清點</span></div>
+      <div class="stat"><b id="posCount">0</b><span>位置數</span></div>
+      <div class="stat"><b id="leftCount">0</b><span>未完成</span></div>
+    </div>
+    <div class="hint">位置清單會依原 CSV 出現順序排列。若主表已按 `03_存放位置表` 的排序整理，這裡也會跟著順。</div>
+    <div id="posList" class="posList"></div>
+  </aside>
+  <section class="card work">
+    <div class="between">
+      <div>
+        <div class="sectionTitle" id="currentTitle">尚未載入清單</div>
+        <div class="hint" id="currentHint">請先載入 `01_物品主表` CSV。</div>
+      </div>
+      <div class="row noPrint">
+        <span class="pill" id="currentProgress">0 / 0</span>
+        <button class="ghost" onclick="window.print()">列印此位置</button>
+      </div>
+    </div>
+    <div class="toolbar noPrint">
+      <input id="searchBox" class="search" placeholder="搜尋此位置內的物品ID、名稱、規格、備註" />
+      <button class="small" id="markAllNormal">本位置全部正常</button>
+      <button class="small" id="showUndone">只看未完成</button>
+      <button class="small" id="showAll">顯示全部</button>
+    </div>
+    <div id="items"></div>
+  </section>
+</main>
+<dialog id="helpDialog"><div class="modal"><h2>CSV 欄位辨識</h2><div class="hint">這個工具會自動尋找常見欄位名稱：</div><div class="mono">物品ID / 分類碼 / 分類 / 名稱 / 物品名稱 / 規格 / 規格摘要 / 數量 / 單位 / 存放位置 / 存放位置碼 / 狀態 / 備註</div><div class="row" style="justify-content:flex-end;margin-top:14px"><button onclick="helpDialog.close()">關閉</button></div></div></dialog>
+<script>
+const state={rows:[],headers:[],map:{},selected:null,filterUndone:false};
+const $=id=>document.getElementById(id);
+function parseCSV(text){
+  const rows=[]; let row=[], cell='', q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i], n=text[i+1];
+    if(q){ if(c==='"'&&n==='"'){cell+='"';i++;} else if(c==='"'){q=false;} else cell+=c; }
+    else{ if(c==='"')q=true; else if(c===','){row.push(cell);cell='';} else if(c==='\n'){row.push(cell);rows.push(row);row=[];cell='';} else if(c==='\r'){} else cell+=c; }
+  }
+  row.push(cell); rows.push(row);
+  return rows.filter(r=>r.some(v=>String(v||'').trim()!==''));
+}
+function csvEscape(v){v=(v??'').toString(); return /[",\n\r]/.test(v)?'"'+v.replaceAll('"','""')+'"':v;}
+function norm(s){return String(s||'').replace(/\s+/g,'').trim();}
+function pick(headers, names){const hh=headers.map(norm); for(const name of names){const i=hh.indexOf(norm(name)); if(i>=0)return i;} return -1;}
+function loadRows(matrix){
+  const headers=matrix[0].map(h=>String(h||'').trim()); state.headers=headers;
+  const map={
+    id:pick(headers,['物品ID','物品 Id','ID','ItemID']), category:pick(headers,['分類碼','分類']),
+    name:pick(headers,['名稱','物品名稱','品名']), spec:pick(headers,['規格','規格摘要','規格說明']),
+    qty:pick(headers,['數量','目前數量']), unit:pick(headers,['單位']),
+    loc:pick(headers,['存放位置','存放位置碼','位置','位置名稱']), status:pick(headers,['狀態','清點狀態']),
+    note:pick(headers,['備註','說明'])
+  }; state.map=map;
+  state.rows=matrix.slice(1).map((r,idx)=>({
+    _idx:idx+2, raw:r, id:get(r,map.id), category:get(r,map.category), name:get(r,map.name), spec:get(r,map.spec),
+    qty:get(r,map.qty), unit:get(r,map.unit), loc:get(r,map.loc)||'未指定位置', oldStatus:get(r,map.status), oldNote:get(r,map.note),
+    checkStatus: localStorage.getItem('inv_status_'+get(r,map.id)) || '', actualQty: localStorage.getItem('inv_qty_'+get(r,map.id)) || get(r,map.qty),
+    newLoc: localStorage.getItem('inv_loc_'+get(r,map.id)) || (get(r,map.loc)||'未指定位置'), note: localStorage.getItem('inv_note_'+get(r,map.id)) || ''
+  })).filter(x=>x.id||x.name||x.spec);
+  state.selected = groupPositions()[0]?.loc || null; render();
+}
+function get(r,i){return i>=0?String(r[i]??'').trim():'';}
+function groupPositions(){
+  const order=[], obj={};
+  for(const r of state.rows){const loc=r.loc||'未指定位置'; if(!obj[loc]){obj[loc]=[];order.push(loc)} obj[loc].push(r)}
+  return order.map(loc=>({loc,rows:obj[loc],done:obj[loc].filter(isDone).length,total:obj[loc].length}));
+}
+function isDone(r){return !!r.checkStatus;}
+function saveRow(r){
+  if(!r.id)return; localStorage.setItem('inv_status_'+r.id,r.checkStatus||''); localStorage.setItem('inv_qty_'+r.id,r.actualQty||''); localStorage.setItem('inv_loc_'+r.id,r.newLoc||''); localStorage.setItem('inv_note_'+r.id,r.note||'');
+}
+function render(){
+  const total=state.rows.length, done=state.rows.filter(isDone).length, groups=groupPositions();
+  $('totalCount').textContent=total; $('doneCount').textContent=done; $('leftCount').textContent=total-done; $('posCount').textContent=groups.length;
+  $('posList').innerHTML=groups.map(g=>`<button class="posBtn ${g.loc===state.selected?'active':''}" onclick="selectPos('${encodeURIComponent(g.loc)}')"><div class="posName">${esc(g.loc)}</div><div class="posMeta">${g.done} / ${g.total} 已清點</div><div class="bar"><i style="width:${g.total?Math.round(g.done/g.total*100):0}%"></i></div></button>`).join('');
+  renderItems();
+}
+function selectPos(loc){state.selected=decodeURIComponent(loc); state.filterUndone=false; $('searchBox').value=''; render();}
+function renderItems(){
+  const q=$('searchBox').value.trim().toLowerCase(); let rows=state.rows.filter(r=>(r.loc||'未指定位置')===state.selected);
+  if(state.filterUndone) rows=rows.filter(r=>!isDone(r));
+  if(q) rows=rows.filter(r=>[r.id,r.name,r.spec,r.oldNote,r.note].join(' ').toLowerCase().includes(q));
+  const all=state.rows.filter(r=>(r.loc||'未指定位置')===state.selected); const done=all.filter(isDone).length;
+  $('currentTitle').textContent=state.selected||'尚未選擇位置'; $('currentHint').textContent=state.selected?`請把「${state.selected}」相關物品集中處理，完成後再換下一個位置。`:'請先載入 CSV。'; $('currentProgress').textContent=`${done} / ${all.length}`;
+  $('items').innerHTML = rows.length ? rows.map(itemHTML).join('') : `<div class="empty">沒有符合條件的物品。</div>`;
+}
+function itemHTML(r){
+  const cls = r.checkStatus==='正常'?'done':(r.checkStatus==='找不到'?'missing':(r.checkStatus?'issue':''));
+  return `<article class="item ${cls}" data-id="${esc(r.id)}"><div class="between"><span class="id">${esc(r.id||'無ID')}</span><span class="pill">原列號 ${r._idx}</span></div><div class="name">${esc(r.name||'未命名')}</div><div class="spec">${esc(r.spec||'無規格')}</div><div class="grid"><div class="label">原數量</div><div>${esc(r.qty)} ${esc(r.unit)}</div><div class="label">實際數量</div><input class="qty" value="${esc(r.actualQty)}" onchange="updateField('${escAttr(r.id)}','actualQty',this.value)"><div class="label">新位置</div><input value="${esc(r.newLoc)}" onchange="updateField('${escAttr(r.id)}','newLoc',this.value)"><div class="label">清點狀態</div><select class="status" onchange="updateField('${escAttr(r.id)}','checkStatus',this.value)"><option value="">未清點</option>${['正常','數量不符','位置不符','找不到','待確認'].map(s=>`<option ${r.checkStatus===s?'selected':''}>${s}</option>`).join('')}</select><div class="label">備註</div><textarea class="note" onchange="updateField('${escAttr(r.id)}','note',this.value)" placeholder="例如：外袋破損、數量待複查、已改放新盒">${esc(r.note)}</textarea></div><div class="toolbar noPrint"><button class="small primary" onclick="quickNormal('${escAttr(r.id)}')">正常，位置不變</button><button class="small" onclick="quickStatus('${escAttr(r.id)}','數量不符')">數量不符</button><button class="small" onclick="quickStatus('${escAttr(r.id)}','找不到')">找不到</button><button class="small" onclick="quickStatus('${escAttr(r.id)}','待確認')">待確認</button></div></article>`;
+}
+function updateField(id,field,value){const r=state.rows.find(x=>x.id===id); if(!r)return; r[field]=value; saveRow(r); render();}
+function quickNormal(id){const r=state.rows.find(x=>x.id===id); if(!r)return; r.checkStatus='正常'; r.actualQty=r.actualQty||r.qty; r.newLoc=r.loc||r.newLoc; saveRow(r); render();}
+function quickStatus(id,s){const r=state.rows.find(x=>x.id===id); if(!r)return; r.checkStatus=s; saveRow(r); render();}
+function markAllNormal(){for(const r of state.rows.filter(x=>(x.loc||'未指定位置')===state.selected)){if(!r.checkStatus){r.checkStatus='正常'; r.actualQty=r.actualQty||r.qty; r.newLoc=r.loc||r.newLoc; saveRow(r);}} render();}
+function exportCSV(){
+  const out=[['清點時間','物品ID','分類碼','名稱','規格','原存放位置','新存放位置','原數量','實際數量','單位','清點狀態','備註','主表原列號','已回填']];
+  const t=new Date().toLocaleString('zh-TW',{hour12:false});
+  for(const r of state.rows.filter(isDone)){out.push([t,r.id,r.category,r.name,r.spec,r.loc,r.newLoc,r.qty,r.actualQty,r.unit,r.checkStatus,r.note,r._idx,'FALSE']);}
+  const csv='\ufeff'+out.map(row=>row.map(csvEscape).join(',')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='09_清點暫存表_匯入_'+new Date().toISOString().slice(0,10)+'.csv'; a.click(); URL.revokeObjectURL(a.href);
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function escAttr(s){return esc(s).replace(/`/g,'&#96;');}
+$('csvFile').addEventListener('change',e=>{const f=e.target.files[0]; if(!f)return; const reader=new FileReader(); reader.onload=()=>loadRows(parseCSV(reader.result)); reader.readAsText(f,'utf-8');});
+$('searchBox').addEventListener('input',renderItems); $('exportBtn').onclick=exportCSV; $('markAllNormal').onclick=markAllNormal; $('showUndone').onclick=()=>{state.filterUndone=true;renderItems();}; $('showAll').onclick=()=>{state.filterUndone=false;renderItems();};
+$('clearBtn').onclick=()=>{if(confirm('確定清空本工具的暫存清點紀錄？不會影響你的 Google Sheets。')){Object.keys(localStorage).filter(k=>k.startsWith('inv_')).forEach(k=>localStorage.removeItem(k)); state.rows=[];state.selected=null;render();}};
+$('sampleBtn').onclick=()=>loadRows(parseCSV('物品ID,分類碼,名稱,規格,數量,單位,存放位置,狀態,備註\nMOD-0001,MOD,蜂鳴器模組,5V 主動式,5,個,模組、接頭、端子,,\nCON-0001,CON,重定保險開關,5A,2,個,模組、接頭、端子,,\nRES-0001,RES,金屬膜電阻,1K 1/4W,20,個,電阻、電容、LED,,\nHDW-0001,HDW,M3 尼龍柱,10mm,12,個,螺絲、螺帽、隔離柱、墊片,,\n'));
+render();
+</script>
+</body>
+</html>
